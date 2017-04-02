@@ -5,8 +5,8 @@ Created on Thu Feb 16 14:42:48 2017
 @author: JAY CHAKALSIYA
 """
 
-from Indicators import EMA, MACD_Hist, SMA, TEMA, SIGNAL, PPO
-from Date import DATEMAP,  DATEPRICESLOP
+from Indicators import EMA, MACD_Hist, SMA, TEMA, SIGNAL, PPO, RSI, AROON, OBV, STOS
+from Date import DATEMAP, DATEPRICESLOP, DEVIATOR
 
 #------------------------------------------------------------------------------------------------------------------------#
 
@@ -18,6 +18,11 @@ def DATAMAP (df):
     final_frame["TEMA"] = TEMA(df,20)
     final_frame["PPO"] = PPO(df)
     final_frame["MACD"] = MACD_Hist(df)
+    final_frame["RSI"] = RSI(df)
+    final_frame["AROON"] = AROON(df,25)
+    final_frame["OBV"] = OBV(df)
+    final_frame["STOS"] = STOS(df,14)
+    
     final_frame["SIGNAL"] = SIGNAL(df)
     final_frame["MAPPED DATE"]=DATEMAP(df)
     
@@ -28,17 +33,13 @@ def DATAMAP (df):
         i+=1
     final_frame["TARGET"] = Target_List
     return final_frame[1:-26]
-        
-
-
-        
     
 #-----------------------------------------------------------------------------------------------------------------------#
 
 def GENERATEFEED(df):
     feeddata = DATAMAP(df)
     
-    indicator_list=["EMA","SMA","TEMA","PPO","MACD"]
+    indicator_list=["EMA","SMA","TEMA","PPO","MACD","RSI","OBV"]
 
     i=0
     while i<len(indicator_list):
@@ -47,6 +48,7 @@ def GENERATEFEED(df):
             feeddata[indicator_list[i]+str(j)]=DEVIATOR(feeddata,j,indicator_list[i])
             j=j+1
         i=i+1
+        print(i)
     
     
     i=1
@@ -56,24 +58,5 @@ def GENERATEFEED(df):
     
     
     return feeddata
-    
-#---------------------------------------------------------------------------------------------------------------------------------------
-# indicator deviator
 
-def DEVIATOR(df,i,indicator):
-    deviation_list = []
 
-    j=0
-    while j<i:
-        deviation_list.append(0.0)
-        j=j+1
-        
-    j=len(df)-1-i
-    while j>=0 :
-        deviation = (df.iloc[j][indicator] - df.iloc[j+i][indicator])*100/df.iloc[j+i][indicator]
-        deviation_list.append(deviation)
-        j=j-1
-    
-    deviation_list.reverse()
-        
-    return deviation_list
