@@ -1,11 +1,35 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Mar 26 15:17:57 2017
+Created on Sat Mar 25 17:48:13 2017
 
-@author: kruth
+@author: JAY CHAKALSIYA
 """
 
-#----------------------------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------#
+
+
+def DATEMAP(df):
+    maximum = max(df["Adj Close"])
+    minimum = min(df["Adj Close"])
+    mapped_date_list=[]
+    
+    Adj_close_difference = maximum-minimum
+    date_difference=DATERANGE(df.iloc[-1]["Date"],df.iloc[0]["Date"])
+    
+    multiplier = Adj_close_difference/date_difference
+    constant = minimum+1
+    
+    i=0
+    j=len(df)-1
+    while i <= len(df)-1:
+        mapped = constant + multiplier*DATERANGE(df.iloc[j]["Date"],df.iloc[j-i]["Date"])
+        mapped_date_list.append(mapped)
+        i+=1
+        
+    mapped_date_list.reverse()
+    return mapped_date_list
+    
+  #----------------------------------------------------------------------------------------------------------------------------------------
 
 def DATERANGE(first,last):
     last = last.split('-')
@@ -76,27 +100,30 @@ def DATEPRICESLOP(df,i):
     return slop_list
     
     
+#---------------------------------------------------------------------------------------------------------------------------------------
+# indicator deviator
 
-  #-----------------------------------------------------------------------------------------------------------------------#
+def DEVIATOR(df,i,indicator):
+    deviation_list = []
 
-
-def DATEMAP(df):
-    maximum = max(df["Adj Close"])
-    minimum = min(df["Adj Close"])
-    mapped_date_list=[]
-    
-    Adj_close_difference = maximum-minimum
-    date_difference=DATERANGE(df.iloc[-1]["Date"],df.iloc[0]["Date"])
-    
-    multiplier = Adj_close_difference/date_difference
-    constant = minimum+1
-    
-    i=0
-    j=len(df)-1
-    while i <= len(df)-1:
-        mapped = constant + multiplier*DATERANGE(df.iloc[j]["Date"],df.iloc[j-i]["Date"])
-        mapped_date_list.append(mapped)
-        i+=1
+    j=0
+    while j<i:
+        deviation_list.append(0.0)
+        j=j+1
         
-    mapped_date_list.reverse()
-    return mapped_date_list
+    j=len(df)-1-i
+    while j>=0 :
+        deviation = (df.iloc[j][indicator] - df.iloc[j+i][indicator])*100/(df.iloc[j+i][indicator]*(df.iloc[j]["MAPPED DATE"]-df.iloc[j+i]["MAPPED DATE"]))
+        #deviation = (df.iloc[j][indicator] - df.iloc[j+i][indicator])*100/df.iloc[j+i][indicator]
+        deviation_list.append(deviation)
+        j=j-1
+    
+    deviation_list.reverse()
+        
+    return deviation_list
+              
+        
+        
+    
+   
+    
