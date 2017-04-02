@@ -2,13 +2,15 @@
 """
 Created on Sun Feb 12 22:45:41 2017
 
-@author: JAY CHAKALSIYA
+@author: JAY CHAKALASIYA
 """
 
 #indicators
 
-# Date  should be given in the order as 0-highest and n-lowest order
 
+
+#--------------------------------------------------------------------------------------------------------------------------------------
+# Date  should be given in the order as 0-highest and n-lowest order
 
 def SIGNAL(df):
     BIASED_List = ["N/A"]
@@ -170,38 +172,99 @@ def TEMA(df, Time_Span):  # Triple Exponential Moving Average
 #-----------------------------------------------------------------------------------------------------------------------------------------
         
 def RSI(df):    #Relative Strength Index
-    RSI_List=[0]
-    Avg_Gain=0
-    Avg_Loss=0
+    GL_List=[0]
     Current_Index=len(df)-2
+    End_Index=0
+    while Current_Index>=End_Index:
+        var = df.iloc[Current_Index]["Adj Close"]-df.iloc[Current_Index+1]["Adj Close"]
+        GL_List.append(var)
+        Current_Index-=1
+        
     
-    while len(df)-Current_Index <=14:
-        RSI_List.append(0)
-        if (df.iloc[Current_Index]["Adj Close"]-df.iloc[Current_Index+1]["Adj Close"]) > 0:
-            Avg_Gain = (df.iloc[Current_Index]["Adj Close"]-df.iloc[Current_Index+1]["Adj Close"])/14
+    AvG_List=[]
+    AvL_List=[]
+    Current_AvG=0
+    Current_AvL=0
+    RS=[]
+    RSI=[]
+
+    i=0
+    while i <14:
+        
+        AvG_List.append(0)
+        AvL_List.append(0)
+        
+        if GL_List[i] > 0:
+            Current_AvG+=GL_List[i]/14
+
+        if GL_List[i] < 0:
+            Current_AvL-=GL_List[i]/14
+
+        RS.append(0.0)
+        RSI.append(0)
+        i+=1
+        
+    while i < len(df):
+        
+        if GL_List[i] > 0:
+            Current_AvG = ((Current_AvG*13) + GL_List[i])/14
         else:
-            Avg_Loss = (df.iloc[Current_Index+1]["Adj Close"]-df.iloc[Current_Index]["Adj Close"])/14
-        Current_Index=Current_Index-1
+            Current_AvG = Current_AvG*13/14
+        AvG_List.append(Current_AvG)
+        
+        if GL_List[i] < 0:
+            Current_AvL = ((Current_AvL*13) - GL_List[i])/14
+        else:
+            Current_AvL = Current_AvL*13/14            
+        AvL_List.append(Current_AvL)
+        
+        RS.append(Current_AvG/Current_AvL)
+        RSI.append(100-100/(1+RS[i]))
+        
+        i+=1
+    RSI.reverse()
+    return RSI
+  
     
+#---------------------------------------------------------------------------------------------------------------------
+#Aroon Oscillator
+
+def AROON(df,days):
+    Aroon_Osci_List=[]
+    
+    Current_Index=len(df)-1
+    
+    while (len(df)-1-Current_Index)<days:
+        Aroon_Osci_List.append(0)        
+        Current_Index= Current_Index-1
+        
     while Current_Index>=0:
-        if (df.iloc[Current_Index]["Adj Close"]-df.iloc[Current_Index+1]["Adj Close"]) > 0:
-            Avg_Gain = (Avg_Gain*13+df.iloc[Current_Index]["Adj Close"]-df.iloc[Current_Index+1]["Adj Close"])/14
-        else:
-            Avg_Gain = (Avg_Gain*13)/14
-
-        if (df.iloc[Current_Index]["Adj Close"]-df.iloc[Current_Index+1]["Adj Close"]) < 0:
-            Avg_Loss = (Avg_Loss*13+df.iloc[Current_Index+1]["Adj Close"]-df.iloc[Current_Index]["Adj Close"])/14
-        else:
-            Avg_Loss = (Avg_Loss*13)/14
-
+        j=0
+        Last_High_Noted=0
+        Last_Low_Noted=0
+        print(Current_Index)
+        
+        while j<days:
+            if df.iloc[Current_Index-Last_High_Noted]["High"] < df.iloc[Current_Index-Last_High_Noted-1]["High"]:
+                Last_High_Noted=Last_High_Noted-1
+            if df.iloc[Current_Index-Last_Low_Noted]["Low"] > df.iloc[Current_Index-Last_Low_Noted-1]["Low"]:
+                Last_Low_Noted=Last_Low_Noted-1
+            j=j+1
             
-        RSI_List.append(100*(1-(1/(1+(Avg_Gain/Avg_Loss)))))   
-        Current_Index=Current_Index-1
-    RSI_List.reverse()
-    return RSI_List
+       
+        
+        Aroon_Up = (days-(Last_High_Noted/days))*100
+        Aroon_Down = (days-(Last_Low_Noted/days))*100
+        Aroon_Osci_List.append(Aroon_Up-Aroon_Down)
+        
+        Current_Index= Current_Index-1
+      
+    Aroon_Osci_List.reverse()
+    return Aroon_Osci_List
     
-#----------------------------------------------------------------------------------------------------------------------------------------
     
+    
+#--------------------------------------------------------------------------------------------------------------------
 def STOS(df,per):    #%K indicator, Not %D
     dflen = len(df)
     k_list=[]
@@ -218,7 +281,8 @@ def STOS(df,per):    #%K indicator, Not %D
         
     k_list.reverse()
     return k_list
- 
+
+    
 #----------------------------------------------------------------------------------------------------------------------------------------
 
 def OBV(df):
@@ -245,4 +309,3 @@ def OBV(df):
     
     o_list.reverse()
     return o_list
-    
