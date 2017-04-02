@@ -1,6 +1,8 @@
 # Stock-Market-Prediction-And-Feature-selection
-This project deals with the use of machine learning to predict changes in stock values as well as we incorporating study on effect of different feature selection in our results, as well as we are introducing the non traditional features like Date with specific mapping function and many stock market anomalies
+This project deals with the use of machine learning to predict changes in stock values as well as incorporates study on effect of different feature selection in prediction.
 
+
+Aim of this project is to prove that via using the Date and other non-traditional features like Day of the week effect, Month of the year effect and other market anomalies as an feature to predict stock rates, the result will improve notably.
 
 
 Our Project mainly focuses on the creating a feed data for tarining of machine learning algorithms 
