@@ -2,7 +2,7 @@
 """
 Created on Thu Feb 16 14:42:48 2017
 
-@author: JAY CHAKALSIYA
+@author: JAY CHAKALASIYA
 """
 
 from Indicators import EMA, MACD_Hist, SMA, TEMA, SIGNAL, PPO, RSI, AROON, OBV, STOS
